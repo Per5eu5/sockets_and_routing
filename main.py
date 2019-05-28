@@ -1,8 +1,10 @@
 import socket
+from views import *
+
 
 URLS = {
-    '/': 'hello index',
-    '/blog': 'hello blog'
+    '/': index,
+    '/blog': blog
 }
 
 
@@ -21,10 +23,20 @@ def generate_headers(method, url):
     return ('HTTP/1.1 200 OK\n\n', 200)
 
 
+def generate_content(code, url):
+    if code == 404:
+        return '<h1>404</h1><p>Not found<p>'
+    if code == 405:
+        return '<h1>405</h1><p>Method not allowed<p>'
+    return URLS[url]()
+
+
+
 def generate_response(request):
     method, url = parse_request(request)
     headers, code = generate_headers(method, url)
-    return (headers + 'hello world').encode()
+    body = generate_content(code, url)
+    return (headers + body).encode()
 
 
 def run():
